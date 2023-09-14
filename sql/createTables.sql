@@ -68,10 +68,10 @@ tag_name varchar(50) PRIMARY KEY
 DROP TABLE IF EXISTS tag_recommendation;
 CREATE TABLE tags (
 	tag_name varchar ,
-  	recommendation_url varchar ,
+  	url varchar ,
   	FOREIGN KEY (tag_name) REFERENCES tags_cloud (tag_name),
-  	FOREIGN KEY (recommendation_url) REFERENCES recommendations (url),
-  PRIMARY KEY (tag_name, recommendation_url)
+  	FOREIGN KEY (url) REFERENCES recommendations (url),
+  PRIMARY KEY (tag_name, url)
 );
 
   SELECT recommendations.url, COUNT(votes.is_like) AS like_count
@@ -85,3 +85,25 @@ FROM votes
 LEFT JOIN recommendations ON votes.url = recommendations.url
 WHERE votes.is_like = false
 GROUP BY recommendations.url;
+
+SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
+FROM recommendations r
+LEFT JOIN (
+    SELECT url, COUNT(*) AS like_count
+    FROM votes
+    WHERE is_like = true
+    GROUP BY url
+) AS likes ON r.url = likes.url
+LEFT JOIN (
+    SELECT url, COUNT(*) AS dislike_count
+    FROM votes
+    WHERE is_like = false
+    GROUP BY url
+) AS dislikes ON r.url = dislikes.url
+LEFT JOIN (
+    SELECT url, STRING_AGG(tag_name, '') AS tag_list
+    FROM tags
+    GROUP BY url
+) AS tags ON r.url = tags.url
+ORDER BY r.creation_date DESC LIMIT 10;
+
