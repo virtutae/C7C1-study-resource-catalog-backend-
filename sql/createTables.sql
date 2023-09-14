@@ -4,29 +4,7 @@ CREATE TABLE users (
     user_name varchar(40) NOT NULL UNIQUE,
     is_faculty boolean NOT NULL
 );
-INSERT INTO users (user_name, is_faculty)
-VALUES ('Adil', false),
-    ('Ana', false),
-('Beth', false),
-('Carlton', false),
-('Cynthia', false),
-('Dani', false),
-    ('Henry', false),
-('HoKei', false),
-('Julieta', false),
-('Laura', false),
-('Oskar', false),
-    ('Rosie', false),
-('Silviu', false),
-('Stephanie', false),
-('Tom', false),
-('Tomasz', false),
-('Viky', false),
-('Łucja', false),
-    ('Neill', true),
-('Katie', true),
-('Nico', true),
-('Marta', true);
+
 DROP TABLE IF EXISTS recommendations;
 CREATE TABLE recommendations(
     url varchar PRIMARY KEY,
@@ -48,30 +26,7 @@ CREATE TABLE recommendations(
     ),
     reason varchar (255) NOT NULL
 );
-INSERT INTO recommendations (
-        url,
-        name,
-        author,
-        description,
-        content_type,
-        build_phase,
-        creation_date,
-        user_id,
-        recommendation_type,
-        reason
-    )
-VALUES(
-        'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet',
-        'Classes in JS',
-        'Codecademy',
-        'Cheatsheet on how to use classes in JS',
-        'article',
-        'week 11',
-        CURRENT_TIMESTAMP,
-        13,
-        'I haven''t used this resource but it looks promising',
-        'I think it''s useful'
-    );
+
 
 DROP TABLE IF EXISTS votes;
 
@@ -119,46 +74,14 @@ CREATE TABLE tags (
   PRIMARY KEY (tag_name, recommendation_url)
 );
 
-INSERT into tags_cloud (tag_name) VALUES 
-('JavaScript'),
-  ('TypeScript'),
-  ('Front-End Development'),
-  ('Web Development'),
-  ('Programming'),
-  ('Node.js'),
-  ('React'),
-  ('ES6'),
-  ('jQuery'),
-  ('AJAX'),
-  ('JSON'),
-  ('Promises'),
-  ('Asynchronous Programming'),
-  ('NPM'),
-  ('Module Systems'),
-  ('Express.js'),
-  ('RESTful APIs'),
-  ('Webpack'),
-  ('Babel'),
-  ('Redux'),
-  ('DOM Manipulation'),
-  ('Event Handling'),
-  ('Front-End Frameworks'),
-  ('JavaScript Testing'),
-  ('TypeScript Compiler'),
-  ('Type Annotations'),
-  ('Design Patterns'),
-  ('Java'),
-  ('Java Development'),
-  ('Java Programming'),
-  ('Java Design Patterns'),
-  ('Java JDBC'),
-  ('Java RESTful Web Services'),
-  ('Java Android Development'),
-  ('Java GUI'),
-  ('GIT'),
-  ('SQL'),
-  ('Postgres'),
-  ('API'),
-  ('DB'),
-  ('HTTP requests'),
-  ('Axios'),
+  SELECT recommendations.url, COUNT(votes.is_like) AS like_count
+FROM votes 
+LEFT JOIN recommendations ON votes.url = recommendations.url
+WHERE votes.is_like = true
+GROUP BY recommendations.url;
+
+SELECT recommendations.url, COUNT(votes.is_like) AS dislike_count
+FROM votes 
+LEFT JOIN recommendations ON votes.url = recommendations.url
+WHERE votes.is_like = false
+GROUP BY recommendations.url;
