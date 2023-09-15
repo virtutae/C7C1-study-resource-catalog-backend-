@@ -79,10 +79,12 @@ app.get("/tag-cloud", async (_req, res) => {
 app.get<{ search: string; tags: string }>(
     "/recommendation/:search/:tags",
     async (req, res) => {
-        const searchTerm = req.params.search;
-        const tagsToSearchArr = req.params.tags
-            .split("£")
-            .filter((t) => t.length !== 0);
+        const searchTerm =
+            req.params.search === "null" ? null : req.params.search;
+        const tagsToSearchArr =
+            req.params.tags === "null"
+                ? null
+                : req.params.tags.split("#").filter((t) => t.length !== 0);
         try {
             const { rows } = await getRecommendationsFiltered(
                 client,

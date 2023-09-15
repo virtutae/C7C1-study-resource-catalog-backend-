@@ -35,11 +35,12 @@ export async function getTagCloud(client: Client) {
 
 export async function getRecommendationsFiltered(
     client: Client,
-    _searchTerm: string,
-    tagsToSearchArr: string[]
+    searchTerm: string | null,
+    tagsToSearchArr: string[] | null
 ) {
-    createTagsWhereClause(tagsToSearchArr);
-    const tags = createTagsWhereClause(tagsToSearchArr);
+    createSearchTagsQuery(tagsToSearchArr);
+    const searchTagsQuery = createSearchTagsQuery(tagsToSearchArr);
+    const searchTermQuery = createSearchTermQuery(searchTerm);
 
     const result = await client.query(
         `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
@@ -61,20 +62,26 @@ export async function getRecommendationsFiltered(
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
-        WHERE ${tags}
+        WHERE ${searchTagsQuery} AND ${searchTermQuery}
         ;`
     );
 
     return result;
 }
 
-function createTagsWhereClause(tagsToSearchArr: string[]): string {
+function createSearchTagsQuery(tagsToSearchArr: string[] | null): string {
+    if (tagsToSearchArr === null) {
+        return "true";
+    }
     const sqlArr = tagsToSearchArr.map((t) => `tag_list LIKE '%#${t}#%'`);
     const sqlStr = sqlArr.join("OR ");
-
-    console.log(sqlStr);
     return sqlStr;
 }
 
-// tags LIKE "%£ana£%" OR tags LIKE "%£ana£%"
-// tags LIKE $1 OR tags LIKE $2
+function createSearchTermQuery(searchTerm: string | null): string {
+    if (searchTerm === null) {
+        return "true";
+    }
+    const sqlStr = `name ILIKE '%${searchTerm}%' OR description ILIKE '%${searchTerm}%' OR author ILIKE '%${searchTerm}%' OR tag_list ILIKE '%${searchTerm}%'`;
+    return sqlStr;
+}
