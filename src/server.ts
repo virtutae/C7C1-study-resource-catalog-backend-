@@ -4,7 +4,7 @@ import express from "express";
 import { Client } from "pg";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
-import { getRecentTenRecommmendations } from "./db";
+import { getTagCloud, getRecentTenRecommmendations } from "./db";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -56,6 +56,16 @@ app.get("/recommendation/recent10", async (_req, res) => {
         res.status(200).json(rows);
     } catch (error) {
         console.error("Error get request for /recommendation/recent10", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.get("/tag-cloud", async (_req, res) => {
+    try {
+        const { rows } = await getTagCloud(client);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error get request for /tags/", error);
         res.status(500).send("An error occurred. Check server logs.");
     }
 });

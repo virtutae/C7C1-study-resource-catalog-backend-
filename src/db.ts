@@ -26,3 +26,9 @@ export async function getRecentTenRecommmendations(client: Client) {
 
     return result;
 }
+
+export async function getTagCloud(client: Client) {
+    const result = await client.query(`SELECT tag_name FROM tags_cloud`);
+
+    return result;
+}
