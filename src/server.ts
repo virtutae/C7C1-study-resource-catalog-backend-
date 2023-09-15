@@ -4,7 +4,11 @@ import express from "express";
 import { Client } from "pg";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
-import { getRecentTenRecommmendations } from "./db";
+import {
+    getTagCloud,
+    getRecentTenRecommmendations,
+    getRecommendationsFiltered,
+} from "./db";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -59,6 +63,44 @@ app.get("/recommendation/recent10", async (_req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
+
+app.get("/tag-cloud", async (_req, res) => {
+    try {
+        const { rows } = await getTagCloud(client);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error get request for /tags/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+// name, description, tags, or author
+// create var for tags and split for hastag pound "£tag£tag" -> ["tag", "tag"]
+app.get<{ search: string; tags: string }>(
+    "/recommendation/:search/:tags",
+    async (req, res) => {
+        const searchTerm =
+            req.params.search === "null" ? null : req.params.search;
+        const tagsToSearchArr =
+            req.params.tags === "null"
+                ? null
+                : req.params.tags.split("#").filter((t) => t.length !== 0);
+        try {
+            const { rows } = await getRecommendationsFiltered(
+                client,
+                searchTerm,
+                tagsToSearchArr
+            );
+            res.status(200).json(rows);
+        } catch (error) {
+            console.error(
+                "Error get request for /recommendation/:search/:tags",
+                error
+            );
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
 
 app.get("/health-check", async (_req, res) => {
     try {
