@@ -9,7 +9,9 @@ import {
     getRecentTenRecommmendations,
     getRecommendationsFiltered,
     getUrl,
+    postNewRecommendation,
 } from "./db";
+import { Recommendation } from "./types/express/Recommendation";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -35,25 +37,6 @@ app.get("/users", async (_req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
-// export interface Recommendation {
-//     url: string;
-//     name: string;
-//     author: string;
-//     description: string;
-//     content_type: string;
-//     build_phase: string;
-//     creation_date: Date; //verify specific type for this one
-//     user_id: number;
-//     recommendation_type:
-//         | "I recommend this resource after having used it"
-//         | "I do not recommend this resource, having used it"
-//         | "I haven't used this resosurce but it looks promising";
-//     reason: string;
-//     likes:number;
-//     dislikes:number;
-//     tags: string[];
-//     comments:UserComment[];
-// }
 
 app.get("/recommendation/recent10", async (_req, res) => {
     try {
@@ -101,7 +84,7 @@ app.get<{ search: string; tags: string }>(
     }
 );
 
-app.post<{}, {}, { url: string }>("/recommendation/new", async (req, res) => {
+app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
     try {
         const url = req.body.url;
         const { rowCount } = await getUrl(client, url);
@@ -115,6 +98,27 @@ app.post<{}, {}, { url: string }>("/recommendation/new", async (req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
+//WORKING ON THE FOLLOWING POST REQUEST 15/09
+
+// app.post<{}, {}, { recommendation: Recommendation }>("/recommendation", async (req, res) => {
+//     try {
+//         const recommendation = req.body.recommendation;
+//         const { rows } = await postNewRecommendation(client, recommendation);
+//         if (rowCount === 0) {
+//             res.status(200).json("Valid URL");
+//         } else {
+//             res.status(403).json("URL already exists");
+//         }
+//     } catch (error) {
+//         console.error("Error get request for /recommendation/new/:url", error);
+//         res.status(500).send("An error occurred. Check server logs.");
+//     }
+// });
+
+// first insert into table recommendations
+// grab the string of tags and separate them by the # and filter empty strings
+// map through the tag array to create the SQL query string.
+//
 
 app.get("/health-check", async (_req, res) => {
     try {

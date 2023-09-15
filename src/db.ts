@@ -3,6 +3,7 @@ import {
     createSearchTagsQuery,
     createSearchTermQuery,
 } from "./utils/createSearchQuery";
+import { Recommendation } from "./types/express/Recommendation";
 
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
@@ -77,6 +78,58 @@ export async function getUrl(client: Client, url: string) {
     const result = await client.query(
         `SELECT * FROM recommendations WHERE url = $1`,
         [url]
+    );
+    return result;
+}
+
+export async function postNewRecommendation(
+    client: Client,
+    recommendation: Recommendation
+) {
+    const {
+        url,
+        name,
+        author,
+        description,
+        content_type,
+        build_phase,
+        creation_date,
+        user_id,
+        recommendation_type,
+        reason,
+        likes,
+        dislikes,
+        tags,
+    } = recommendation;
+    const result = await client.query(
+        `INSERT INTO recommendations (url,
+            name,
+            author,
+            description,
+            content_type,
+            build_phase,
+            creation_date,
+            user_id,
+            recommendation_type,
+            reason,
+            likes,
+            dislikes,
+            tags) VALUES  ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+        [
+            url,
+            name,
+            author,
+            description,
+            content_type,
+            build_phase,
+            creation_date,
+            user_id,
+            recommendation_type,
+            reason,
+            likes,
+            dislikes,
+            tags,
+        ]
     );
     return result;
 }
