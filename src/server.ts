@@ -8,6 +8,7 @@ import {
     getTagCloud,
     getRecentTenRecommmendations,
     getRecommendationsFiltered,
+    getUrl,
 } from "./db";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
@@ -74,8 +75,6 @@ app.get("/tag-cloud", async (_req, res) => {
     }
 });
 
-// name, description, tags, or author
-// create var for tags and split for hastag pound "£tag£tag" -> ["tag", "tag"]
 app.get<{ search: string; tags: string }>(
     "/recommendation/:search/:tags",
     async (req, res) => {
@@ -101,6 +100,21 @@ app.get<{ search: string; tags: string }>(
         }
     }
 );
+
+app.post<{}, {}, { url: string }>("/recommendation/new", async (req, res) => {
+    try {
+        const url = req.body.url;
+        const { rowCount } = await getUrl(client, url);
+        if (rowCount === 0) {
+            res.status(200).json("Valid URL");
+        } else {
+            res.status(403).json("URL already exists");
+        }
+    } catch (error) {
+        console.error("Error get request for /recommendation/new/:url", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
 
 app.get("/health-check", async (_req, res) => {
     try {

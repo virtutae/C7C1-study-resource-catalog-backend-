@@ -72,3 +72,11 @@ export async function getRecommendationsFiltered(
 
     return result;
 }
+
+export async function getUrl(client: Client, url: string) {
+    const result = await client.query(
+        `SELECT * FROM recommendations WHERE url = $1`,
+        [url]
+    );
+    return result;
+}
