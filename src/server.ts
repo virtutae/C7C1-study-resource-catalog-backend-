@@ -1,17 +1,18 @@
+import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { Client } from "pg";
-import { getEnvVarOrFail } from "./support/envVarUtils";
-import { setupDBClientConfig } from "./support/setupDBClientConfig";
 import {
-    getTagCloud,
     getRecentTenRecommmendations,
     getRecommendationsFiltered,
+    getTagCloud,
     getUrl,
     postNewRecommendation,
     postNewTags,
 } from "./db";
+import { getEnvVarOrFail } from "./support/envVarUtils";
+import { setupDBClientConfig } from "./support/setupDBClientConfig";
 import { Recommendation } from "./types/express/Recommendation";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
@@ -105,14 +106,18 @@ app.post<{}, {}, { recommendation: Recommendation }>(
     async (req, res) => {
         try {
             const recommendation = req.body.recommendation;
-            const { rowCount } = await postNewRecommendation(
-                client,
-                recommendation
+            await postNewRecommendation(client, recommendation);
+
+            const { url, tags } = recommendation;
+            await postNewTags(client, tags, url);
+
+            await axios.post(
+                "https://discord.com/api/webhooks/1153278935187062794/FpxDzjkcGrJvWvzJAS7wELMSbtNUOWETgYdi__YcRR_F2cxp5ZH3Nfd5jHOay3LpCHrS",
+                {
+                    content: `New Recommendation added:\nTitle: ${recommendation.name}\nLink: ${recommendation.url}`,
+                }
             );
-            if (rowCount === 1) {
-                const { url, tags } = recommendation;
-                await postNewTags(client, tags, url);
-            }
+
             res.status(200).json("New recommendation added");
         } catch (error) {
             console.error("Error post request for /recommendation/", error);
