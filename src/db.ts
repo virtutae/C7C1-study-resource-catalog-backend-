@@ -1,10 +1,19 @@
 import { Client } from "pg";
+import { RecommendationCandidate } from "./types/Recommendation";
 import {
     createSearchTagsQuery,
     createSearchTermQuery,
 } from "./utils/createSearchQuery";
-import { Recommendation } from "./types/express/Recommendation";
+import { createSqlParams, createSqlValues } from "./utils/createTagsQuery";
 
+// USERS QUERIES
+export async function getUsers(client: Client) {
+    const result = await client.query("SELECT * FROM users;");
+
+    return result;
+}
+
+// RECOMMENDATION QUERIES
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
         `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
@@ -28,12 +37,6 @@ export async function getRecentTenRecommmendations(client: Client) {
         ) AS tags ON r.url = tags.url
         ORDER BY r.creation_date DESC LIMIT 10;`
     );
-
-    return result;
-}
-
-export async function getTagCloud(client: Client) {
-    const result = await client.query(`SELECT tag_name FROM tags_cloud`);
 
     return result;
 }
@@ -74,17 +77,18 @@ export async function getRecommendationsFiltered(
     return result;
 }
 
-export async function getUrl(client: Client, url: string) {
+export async function getRecommendationUrl(client: Client, url: string) {
     const result = await client.query(
         `SELECT * FROM recommendations WHERE url = $1`,
         [url]
     );
+
     return result;
 }
 
 export async function postRecommendation(
     client: Client,
-    recommendation: Recommendation
+    recommendation: RecommendationCandidate
 ) {
     const {
         url,
@@ -107,7 +111,7 @@ export async function postRecommendation(
             user_id,
             recommendation_type,
             reason
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING * ;`,
         [
             url,
             name,
@@ -120,6 +124,7 @@ export async function postRecommendation(
             reason,
         ]
     );
+
     return result;
 }
 
@@ -131,35 +136,21 @@ export async function postTags(client: Client, tags: string, url: string) {
     const sqlValues = createSqlValues(tags);
     const sqlParams = createSqlParams(tags, url);
     const result = await client.query(
-        `INSERT INTO tags (tag_name, url) VALUES ${sqlValues}`,
+        `INSERT INTO tags (tag_name, url) VALUES ${sqlValues};`,
         sqlParams
     );
+
     return result;
 }
 
-function createSqlValues(tags: string) {
-    let paramCounter = 1;
-    const tagsArr = tags.split("#").filter((t) => t !== "");
+// TAG-CLOUD QUERIES
+export async function getTagCloud(client: Client) {
+    const result = await client.query(`SELECT tag_name FROM tags_cloud;`);
 
-    const sqlValuesArr = tagsArr.map(
-        () => `($${paramCounter++}, $${paramCounter++})`
-    );
-    const sqlValues = sqlValuesArr.join(", ");
-    return sqlValues;
+    return result;
 }
 
-function createSqlParams(tags: string, url: string) {
-    const tagsArr = tags.split("#").filter((t) => t !== "");
-    const tagsWithHashtagArr = tagsArr.map((t) => `#${t}`);
-    const sqlParams: string[] = [];
-
-    tagsWithHashtagArr.forEach((t) => {
-        sqlParams.push(t);
-        sqlParams.push(url);
-    });
-    return sqlParams;
-}
-
+// COMMENT QUERIES
 export async function postComment(
     client: Client,
     user_id: number,
@@ -170,9 +161,11 @@ export async function postComment(
         "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
         [user_id, recommendation_url, text]
     );
+
     return result;
 }
 
+// VOTES QUERIES
 export async function upsertVote(
     client: Client,
     user_id: number,
@@ -180,16 +173,18 @@ export async function upsertVote(
     is_like: boolean
 ) {
     const result = await client.query(
-        "INSERT INTO votes(user_id, url, is_like) VALUES ($1, $2, $3) ON CONFLICT (user_id, url) DO UPDATE SET is_like = $3 RETURNING *",
+        "INSERT INTO votes(user_id, url, is_like) VALUES ($1, $2, $3) ON CONFLICT (user_id, url) DO UPDATE SET is_like = $3 RETURNING *;",
         [user_id, url, is_like]
     );
+
     return result;
 }
 
 export async function deleteVote(client: Client, user_id: number, url: string) {
     const result = await client.query(
-        "DELETE FROM votes WHERE user_id = $1 AND url = $2 RETURNING *",
+        "DELETE FROM votes WHERE user_id = $1 AND url = $2 RETURNING *;",
         [user_id, url]
     );
+
     return result;
 }
