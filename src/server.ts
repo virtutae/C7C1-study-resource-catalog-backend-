@@ -1,14 +1,20 @@
+import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { Client } from "pg";
-import { getEnvVarOrFail } from "./support/envVarUtils";
-import { setupDBClientConfig } from "./support/setupDBClientConfig";
 import {
-    getTagCloud,
     getRecentTenRecommmendations,
     getRecommendationsFiltered,
+    getTagCloud,
+    getUrl,
+    postNewComment,
+    postNewRecommendation,
+    postNewTags,
 } from "./db";
+import { getEnvVarOrFail } from "./support/envVarUtils";
+import { setupDBClientConfig } from "./support/setupDBClientConfig";
+import { Recommendation } from "./types/express/Recommendation";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -34,25 +40,6 @@ app.get("/users", async (_req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
-// export interface Recommendation {
-//     url: string;
-//     name: string;
-//     author: string;
-//     description: string;
-//     content_type: string;
-//     build_phase: string;
-//     creation_date: Date; //verify specific type for this one
-//     user_id: number;
-//     recommendation_type:
-//         | "I recommend this resource after having used it"
-//         | "I do not recommend this resource, having used it"
-//         | "I haven't used this resosurce but it looks promising";
-//     reason: string;
-//     likes:number;
-//     dislikes:number;
-//     tags: string[];
-//     comments:UserComment[];
-// }
 
 app.get("/recommendation/recent10", async (_req, res) => {
     try {
@@ -74,8 +61,6 @@ app.get("/tag-cloud", async (_req, res) => {
     }
 });
 
-// name, description, tags, or author
-// create var for tags and split for hastag pound "£tag£tag" -> ["tag", "tag"]
 app.get<{ search: string; tags: string }>(
     "/recommendation/:search/:tags",
     async (req, res) => {
@@ -101,6 +86,57 @@ app.get<{ search: string; tags: string }>(
         }
     }
 );
+
+app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
+    try {
+        const url = req.body.url;
+        const { rowCount } = await getUrl(client, url);
+        if (rowCount === 0) {
+            res.status(200).json("Valid URL");
+        } else {
+            res.status(403).json("URL already exists");
+        }
+    } catch (error) {
+        console.error("Error get request for /recommendation/new/:url", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.post<{}, {}, { recommendation: Recommendation }>(
+    "/recommendation",
+    async (req, res) => {
+        try {
+            const recommendation = req.body.recommendation;
+            await postNewRecommendation(client, recommendation);
+
+            const { url, tags } = recommendation;
+            await postNewTags(client, tags, url);
+
+            await axios.post(
+                "https://discord.com/api/webhooks/1153278935187062794/FpxDzjkcGrJvWvzJAS7wELMSbtNUOWETgYdi__YcRR_F2cxp5ZH3Nfd5jHOay3LpCHrS",
+                {
+                    content: `New Recommendation added:\nTitle: ${recommendation.name}\nLink: ${recommendation.url}`,
+                }
+            );
+
+            res.status(200).json("New recommendation added");
+        } catch (error) {
+            console.error("Error post request for /recommendation/", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
+
+app.post("/comments", async (req, res) => {
+    try {
+        const { user_id, recommendation_url, text } = req.body;
+        await postNewComment(client, user_id, recommendation_url, text);
+        res.status(200).json("New comment added");
+    } catch (error) {
+        console.error("Error post request for /comments/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
 
 app.get("/health-check", async (_req, res) => {
     try {

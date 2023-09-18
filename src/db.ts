@@ -3,6 +3,7 @@ import {
     createSearchTagsQuery,
     createSearchTermQuery,
 } from "./utils/createSearchQuery";
+import { Recommendation } from "./types/express/Recommendation";
 
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
@@ -70,5 +71,104 @@ export async function getRecommendationsFiltered(
         ;`
     );
 
+    return result;
+}
+
+export async function getUrl(client: Client, url: string) {
+    const result = await client.query(
+        `SELECT * FROM recommendations WHERE url = $1`,
+        [url]
+    );
+    return result;
+}
+
+export async function postNewRecommendation(
+    client: Client,
+    recommendation: Recommendation
+) {
+    const {
+        url,
+        name,
+        author,
+        description,
+        content_type,
+        build_phase,
+        user_id,
+        recommendation_type,
+        reason,
+    } = recommendation;
+    const result = await client.query(
+        `INSERT INTO recommendations (url,
+            name,
+            author,
+            description,
+            content_type,
+            build_phase,
+            user_id,
+            recommendation_type,
+            reason
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+        [
+            url,
+            name,
+            author,
+            description,
+            content_type,
+            build_phase,
+            user_id,
+            recommendation_type,
+            reason,
+        ]
+    );
+    return result;
+}
+
+export async function postNewTags(client: Client, tags: string, url: string) {
+    if (tags === "") {
+        return;
+    }
+
+    const sqlValues = createSqlValues(tags);
+    const sqlParams = createSqlParams(tags, url);
+    const result = await client.query(
+        `INSERT INTO tags (tag_name, url) VALUES ${sqlValues}`,
+        sqlParams
+    );
+    return result;
+}
+
+function createSqlValues(tags: string) {
+    let paramCounter = 1;
+    const tagsArr = tags.split("#").filter((t) => t !== "");
+
+    const sqlValuesArr = tagsArr.map(
+        () => `($${paramCounter++}, $${paramCounter++})`
+    );
+    const sqlValues = sqlValuesArr.join(", ");
+    return sqlValues;
+}
+
+function createSqlParams(tags: string, url: string) {
+    const tagsArr = tags.split("#").filter((t) => t !== "");
+    const tagsWithHashtagArr = tagsArr.map((t) => `#${t}`);
+    const sqlParams: string[] = [];
+
+    tagsWithHashtagArr.forEach((t) => {
+        sqlParams.push(t);
+        sqlParams.push(url);
+    });
+    return sqlParams;
+}
+
+export async function postNewComment(
+    client: Client,
+    user_id: number,
+    recommendation_url: string,
+    text: string
+) {
+    const result = await client.query(
+        "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
+        [user_id, recommendation_url, text]
+    );
     return result;
 }

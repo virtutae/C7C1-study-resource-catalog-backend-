@@ -44,10 +44,10 @@ DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY ,
   	user_id int NOT NULL,
-  	FOREIGN KEY (user_id) REFERENCES users(id),
-    recommendation_url varchar,
-    FOREIGN KEY (recommendation_url) REFERENCES recommendations(url),
-    text varchar (500)
+  	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    recommendation_url varchar NOT NULL,
+    FOREIGN KEY (recommendation_url) REFERENCES recommendations(url) ON DELETE CASCADE,
+    text varchar (500) NOT NULL
 );
 
 DROP TABLE IF EXISTS study_list;
