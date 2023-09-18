@@ -159,3 +159,16 @@ function createSqlParams(tags: string, url: string) {
     });
     return sqlParams;
 }
+
+export async function postNewComment(
+    client: Client,
+    user_id: number,
+    recommendation_url: string,
+    text: string
+) {
+    const result = await client.query(
+        "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
+        [user_id, recommendation_url, text]
+    );
+    return result;
+}

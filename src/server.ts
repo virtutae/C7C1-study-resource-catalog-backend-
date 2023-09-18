@@ -8,6 +8,7 @@ import {
     getRecommendationsFiltered,
     getTagCloud,
     getUrl,
+    postNewComment,
     postNewRecommendation,
     postNewTags,
 } from "./db";
@@ -125,6 +126,17 @@ app.post<{}, {}, { recommendation: Recommendation }>(
         }
     }
 );
+
+app.post("/comments", async (req, res) => {
+    try {
+        const { user_id, recommendation_url, text } = req.body;
+        await postNewComment(client, user_id, recommendation_url, text);
+        res.status(200).json("New comment added");
+    } catch (error) {
+        console.error("Error post request for /comments/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
 
 app.get("/health-check", async (_req, res) => {
     try {
