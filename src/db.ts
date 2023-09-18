@@ -82,7 +82,7 @@ export async function getUrl(client: Client, url: string) {
     return result;
 }
 
-export async function postNewRecommendation(
+export async function postRecommendation(
     client: Client,
     recommendation: Recommendation
 ) {
@@ -123,7 +123,7 @@ export async function postNewRecommendation(
     return result;
 }
 
-export async function postNewTags(client: Client, tags: string, url: string) {
+export async function postTags(client: Client, tags: string, url: string) {
     if (tags === "") {
         return;
     }
@@ -160,7 +160,7 @@ function createSqlParams(tags: string, url: string) {
     return sqlParams;
 }
 
-export async function postNewComment(
+export async function postComment(
     client: Client,
     user_id: number,
     recommendation_url: string,
@@ -169,6 +169,27 @@ export async function postNewComment(
     const result = await client.query(
         "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
         [user_id, recommendation_url, text]
+    );
+    return result;
+}
+
+export async function upsertVote(
+    client: Client,
+    user_id: number,
+    url: string,
+    is_like: boolean
+) {
+    const result = await client.query(
+        "INSERT INTO votes(user_id, url, is_like) VALUES ($1, $2, $3) ON CONFLICT (user_id, url) DO UPDATE SET is_like = $3 RETURNING *",
+        [user_id, url, is_like]
+    );
+    return result;
+}
+
+export async function deleteVote(client: Client, user_id: number, url: string) {
+    const result = await client.query(
+        "DELETE FROM votes WHERE user_id = $1 AND url = $2 RETURNING *",
+        [user_id, url]
     );
     return result;
 }

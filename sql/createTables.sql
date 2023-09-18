@@ -32,11 +32,11 @@ DROP TABLE IF EXISTS votes;
 
 CREATE TABLE votes (
     user_id int NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     url varchar NOT NULL,
-    FOREIGN KEY (url) REFERENCES recommendations(url),
+    FOREIGN KEY (url) REFERENCES recommendations(url) ON DELETE CASCADE,
   PRIMARY KEY (user_id, url),
-    is_like BOOLEAN
+    is_like BOOLEAN NOT NULL
 );
 
 

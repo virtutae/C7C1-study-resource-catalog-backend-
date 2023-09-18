@@ -4,17 +4,20 @@ import dotenv from "dotenv";
 import express from "express";
 import { Client } from "pg";
 import {
+    deleteVote,
     getRecentTenRecommmendations,
     getRecommendationsFiltered,
     getTagCloud,
     getUrl,
-    postNewComment,
-    postNewRecommendation,
-    postNewTags,
+    postComment,
+    postRecommendation,
+    postTags,
+    upsertVote,
 } from "./db";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
 import { Recommendation } from "./types/express/Recommendation";
+import morgan from "morgan";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -26,6 +29,8 @@ const app = express();
 
 app.use(express.json()); //add JSON body parser to each following route handler
 app.use(cors()); //add CORS support to each following route handler
+
+app.use(morgan("tiny"));
 
 app.get("/", async (_req, res) => {
     res.json({ msg: "Hello! There's nothing interesting for GET /" });
@@ -107,10 +112,10 @@ app.post<{}, {}, { recommendation: Recommendation }>(
     async (req, res) => {
         try {
             const recommendation = req.body.recommendation;
-            await postNewRecommendation(client, recommendation);
+            await postRecommendation(client, recommendation);
 
             const { url, tags } = recommendation;
-            await postNewTags(client, tags, url);
+            await postTags(client, tags, url);
 
             await axios.post(
                 "https://discord.com/api/webhooks/1153278935187062794/FpxDzjkcGrJvWvzJAS7wELMSbtNUOWETgYdi__YcRR_F2cxp5ZH3Nfd5jHOay3LpCHrS",
@@ -130,10 +135,32 @@ app.post<{}, {}, { recommendation: Recommendation }>(
 app.post("/comments", async (req, res) => {
     try {
         const { user_id, recommendation_url, text } = req.body;
-        await postNewComment(client, user_id, recommendation_url, text);
+        await postComment(client, user_id, recommendation_url, text);
         res.status(200).json("New comment added");
     } catch (error) {
         console.error("Error post request for /comments/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.post("/votes", async (req, res) => {
+    try {
+        const { user_id, url, is_like } = req.body;
+        await upsertVote(client, user_id, url, is_like);
+        res.status(200).json("New vote added");
+    } catch (error) {
+        console.error("Error post request for /votes/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.delete("/votes", async (req, res) => {
+    try {
+        const { user_id, url } = req.body;
+        await deleteVote(client, user_id, url);
+        res.status(200).json("Vote deleted");
+    } catch (error) {
+        console.error("Error post request for /votes/", error);
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
