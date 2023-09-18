@@ -10,6 +10,7 @@ import {
     getRecommendationsFiltered,
     getUrl,
     postNewRecommendation,
+    postNewTags,
 } from "./db";
 import { Recommendation } from "./types/express/Recommendation";
 
@@ -98,27 +99,27 @@ app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
-//WORKING ON THE FOLLOWING POST REQUEST 15/09
 
-// app.post<{}, {}, { recommendation: Recommendation }>("/recommendation", async (req, res) => {
-//     try {
-//         const recommendation = req.body.recommendation;
-//         const { rows } = await postNewRecommendation(client, recommendation);
-//         if (rowCount === 0) {
-//             res.status(200).json("Valid URL");
-//         } else {
-//             res.status(403).json("URL already exists");
-//         }
-//     } catch (error) {
-//         console.error("Error get request for /recommendation/new/:url", error);
-//         res.status(500).send("An error occurred. Check server logs.");
-//     }
-// });
-
-// first insert into table recommendations
-// grab the string of tags and separate them by the # and filter empty strings
-// map through the tag array to create the SQL query string.
-//
+app.post<{}, {}, { recommendation: Recommendation }>(
+    "/recommendation",
+    async (req, res) => {
+        try {
+            const recommendation = req.body.recommendation;
+            const { rowCount } = await postNewRecommendation(
+                client,
+                recommendation
+            );
+            if (rowCount === 1) {
+                const { url, tags } = recommendation;
+                await postNewTags(client, tags, url);
+            }
+            res.status(200).json("New recommendation added");
+        } catch (error) {
+            console.error("Error post request for /recommendation/", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
 
 app.get("/health-check", async (_req, res) => {
     try {

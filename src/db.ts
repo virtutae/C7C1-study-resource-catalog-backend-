@@ -93,13 +93,9 @@ export async function postNewRecommendation(
         description,
         content_type,
         build_phase,
-        creation_date,
         user_id,
         recommendation_type,
         reason,
-        likes,
-        dislikes,
-        tags,
     } = recommendation;
     const result = await client.query(
         `INSERT INTO recommendations (url,
@@ -108,13 +104,10 @@ export async function postNewRecommendation(
             description,
             content_type,
             build_phase,
-            creation_date,
             user_id,
             recommendation_type,
-            reason,
-            likes,
-            dislikes,
-            tags) VALUES  ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+            reason
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
         [
             url,
             name,
@@ -122,14 +115,47 @@ export async function postNewRecommendation(
             description,
             content_type,
             build_phase,
-            creation_date,
             user_id,
             recommendation_type,
             reason,
-            likes,
-            dislikes,
-            tags,
         ]
     );
     return result;
+}
+
+export async function postNewTags(client: Client, tags: string, url: string) {
+    if (tags === "") {
+        return;
+    }
+
+    const sqlValues = createSqlValues(tags);
+    const sqlParams = createSqlParams(tags, url);
+    const result = await client.query(
+        `INSERT INTO tags (tag_name, url) VALUES ${sqlValues}`,
+        sqlParams
+    );
+    return result;
+}
+
+function createSqlValues(tags: string) {
+    let paramCounter = 1;
+    const tagsArr = tags.split("#").filter((t) => t !== "");
+
+    const sqlValuesArr = tagsArr.map(
+        () => `($${paramCounter++}, $${paramCounter++})`
+    );
+    const sqlValues = sqlValuesArr.join(", ");
+    return sqlValues;
+}
+
+function createSqlParams(tags: string, url: string) {
+    const tagsArr = tags.split("#").filter((t) => t !== "");
+    const tagsWithHashtagArr = tagsArr.map((t) => `#${t}`);
+    const sqlParams: string[] = [];
+
+    tagsWithHashtagArr.forEach((t) => {
+        sqlParams.push(t);
+        sqlParams.push(url);
+    });
+    return sqlParams;
 }
