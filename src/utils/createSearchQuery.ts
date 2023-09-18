@@ -5,7 +5,7 @@ export function createSearchTagsQuery(
         return "true";
     }
     const sqlArr = tagsToSearchArr.map((t) => `tag_list LIKE '%#${t}#%'`);
-    const sqlStr = sqlArr.join("OR ");
+    const sqlStr = sqlArr.join(" OR ");
     return sqlStr;
 }
 export function createSearchTermQuery(searchTerm: string | null): string {
