@@ -14,6 +14,9 @@ import {
     postTags,
     upsertVote,
     getUsers,
+    getStudyListForUser,
+    postStudyListEntry,
+    deleteStudyListEntry,
 } from "./db";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
@@ -192,6 +195,40 @@ app.delete<{}, string, { user_id: number; url: string }>(
     }
 );
 
+//STUDY-VIEW ROUTES
+
+app.get("/study-list/:user_id", async (req, res) => {
+    try {
+        const user_id = parseInt(req.params.user_id);
+        const { rows } = await getStudyListForUser(client, user_id);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error get request for /study-list/:user_id", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.post("/study-list", async (req, res) => {
+    try {
+        const { user_id, url } = req.body;
+        await postStudyListEntry(client, user_id, url);
+        res.status(200).json("Added new study list entry");
+    } catch (error) {
+        console.error("Error post request for /study-list/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.delete("/study-list", async (req, res) => {
+    try {
+        const { user_id, url } = req.body;
+        await deleteStudyListEntry(client, user_id, url);
+        res.status(200).json("Deleted study list entry");
+    } catch (error) {
+        console.error("Error in delete request for /study-list/", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
 // GENERAL ROUTES
 app.get<{}, string>("/health-check", async (_req, res) => {
     try {
