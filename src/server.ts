@@ -104,9 +104,9 @@ app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
         const url = req.body.url;
         const { rowCount } = await getRecommendationUrl(client, url);
         if (rowCount === 0) {
-            res.status(200).json("Valid URL");
+            res.status(201).json("Valid URL");
         } else {
-            res.status(403).json("URL already exists");
+            res.status(202).json("URL already exists");
         }
     } catch (error) {
         console.error("Error get request for /recommendation/new/:url", error);
