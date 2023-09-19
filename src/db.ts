@@ -191,7 +191,28 @@ export async function deleteVote(client: Client, user_id: number, url: string) {
 
 export async function getStudyListForUser(client: Client, user_id: number) {
     const result = await client.query(
-        "SELECT * FROM study_list WHERE user_id = $1",
+        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count,
+        COALESCE(tags.tag_list, '') AS tags
+                FROM recommendations r
+                LEFT JOIN (
+                    SELECT url, COUNT(*) AS like_count
+                    FROM votes
+                    WHERE is_like = true
+                    GROUP BY url
+                ) AS likes ON r.url = likes.url
+                LEFT JOIN (
+                    SELECT url, COUNT(*) AS dislike_count
+                    FROM votes
+                    WHERE is_like = false
+                    GROUP BY url
+                ) AS dislikes ON r.url = dislikes.url
+                LEFT JOIN (
+                    SELECT url, CONCAT(STRING_AGG(tag_name, ''), '#') AS tag_list
+                    FROM tags
+                    GROUP BY url
+                ) AS tags ON r.url = tags.url
+               LEFT JOIN study_list s ON r.url = s.url
+               WHERE s.user_id = $1`,
         [user_id]
     );
     return result;
@@ -207,4 +228,15 @@ export async function postStudyListEntry(
         [user_id, url]
     );
     return result;
+}
+
+export async function deleteStudyListEntry(
+    client: Client,
+    user_id: number,
+    url: string
+) {
+    await client.query(
+        "DELETE FROM study_list WHERE user_id = $1 AND url = $2",
+        [user_id, url]
+    );
 }
