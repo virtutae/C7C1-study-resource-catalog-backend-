@@ -188,3 +188,11 @@ export async function deleteVote(client: Client, user_id: number, url: string) {
 
     return result;
 }
+
+export async function getStudyListForUser(client: Client, user_id: number) {
+    const result = await client.query(
+        "SELECT * FROM study_list WHERE user_id = $1",
+        [user_id]
+    );
+    return result;
+}

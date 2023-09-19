@@ -139,3 +139,8 @@ VALUES ('Adil', false),
 
 INSERT INTO tags (tag_name, url) VALUES ('#React', 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
 ('#JavaScript', 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet');
+
+INSERT INTO study_list (user_id, url) VALUES (2, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
+(3, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
+(4, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
+(2, 'https://start.spring.io/');
