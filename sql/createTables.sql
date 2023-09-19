@@ -53,9 +53,9 @@ CREATE TABLE comments (
 DROP TABLE IF EXISTS study_list;
 CREATE TABLE study_list (
 	user_id int NOT NULL,
-  	FOREIGN KEY (user_id) REFERENCES users(id),
+  	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   	url varchar NOT NULL,
-    FOREIGN KEY (url) REFERENCES recommendations(url), 
+    FOREIGN KEY (url) REFERENCES recommendations(url) ON DELETE CASCADE, 
   PRIMARY KEY (user_id, url)
 );
 
