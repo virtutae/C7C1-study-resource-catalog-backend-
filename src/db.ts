@@ -196,3 +196,15 @@ export async function getStudyListForUser(client: Client, user_id: number) {
     );
     return result;
 }
+
+export async function postStudyListEntry(
+    client: Client,
+    user_id: number,
+    url: string
+) {
+    const result = await client.query(
+        "INSERT INTO study_list(user_id, url) VALUES ($1, $2)",
+        [user_id, url]
+    );
+    return result;
+}

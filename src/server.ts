@@ -15,6 +15,7 @@ import {
     upsertVote,
     getUsers,
     getStudyListForUser,
+    postStudyListEntry,
 } from "./db";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
@@ -202,6 +203,17 @@ app.get("/study-list/:user_id", async (req, res) => {
         res.status(200).json(rows);
     } catch (error) {
         console.error("Error get request for /study-view/:user_id", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
+app.post("/study-list", async (req, res) => {
+    try {
+        const { user_id, url } = req.body;
+        await postStudyListEntry(client, user_id, url);
+        res.status(200).json("Added new study list entry");
+    } catch (error) {
+        console.error("Error post request for /study-view/", error);
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
