@@ -7,6 +7,7 @@ import { Client } from "pg";
 import {
     deleteStudyListEntry,
     deleteVote,
+    getCommentsFromRecommendation,
     getRecentTenRecommmendations,
     getRecommendationUrl,
     getRecommendationsFiltered,
@@ -28,6 +29,7 @@ import {
 } from "./types/Recommendation";
 import { Tag } from "./types/Tag";
 import { User } from "./types/User";
+import { RecommendationComment } from "./types/RecommendationComment";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
@@ -152,6 +154,20 @@ app.get<{}, Tag[] | string>("/tag-cloud", async (_req, res) => {
 });
 
 // COMMENTS ROUTES
+app.get<{ url: string }, RecommendationComment[] | string>(
+    "/comments/:url",
+    async (req, res) => {
+        try {
+            const { url } = req.params;
+            const { rows } = await getCommentsFromRecommendation(client, url);
+            res.status(200).json(rows);
+        } catch (error) {
+            console.error("Error get request for /comments/:url", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
+
 app.post<
     {},
     string,
