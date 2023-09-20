@@ -6,22 +6,6 @@ import {
 } from "./utils/createSearchQuery";
 import { createSqlParams, createSqlValues } from "./utils/createTagsQuery";
 
-// USERS QUERIES
-export async function getUsers(client: Client) {
-    const result = await client.query("SELECT * FROM users;");
-
-    return result;
-}
-
-export async function getUserName(client: Client, user_id: string) {
-    const result = await client.query(
-        "SELECT user_name FROM users WHERE id = $1",
-        [user_id]
-    );
-
-    return result;
-}
-
 // RECOMMENDATION QUERIES
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
