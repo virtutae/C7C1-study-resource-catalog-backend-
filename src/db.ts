@@ -189,6 +189,19 @@ export async function deleteVote(client: Client, user_id: number, url: string) {
     return result;
 }
 
+export async function getVotes(
+    client: Client,
+    url: string,
+    vote_type: boolean
+): Promise<number> {
+    const result = await client.query(
+        "SELECT * FROM votes WHERE url = $1 AND is_like = $2;",
+        [url, vote_type]
+    );
+
+    return result.rowCount;
+}
+
 export async function getStudyListForUser(client: Client, user_id: number) {
     const result = await client.query(
         `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count,
