@@ -12,6 +12,7 @@ import {
     getRecommendationsFiltered,
     getStudyListForUser,
     getTagCloud,
+    getUserName,
     getUsers,
     getVotes,
     postComment,
@@ -56,6 +57,23 @@ app.get<{}, User[] | string>("/users", async (_req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
+
+app.get<{ user_id: string }, { user_name: string } | string>(
+    "/users/:user_id",
+    async (req, res) => {
+        try {
+            const { user_id } = req.params;
+            const { rows } = await getUserName(client, user_id);
+            res.status(200).json(rows[0]);
+        } catch (error) {
+            console.error(
+                "Error get request for /recommendation/recent10",
+                error
+            );
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
 
 // RECOMMENDATION ROUTES
 app.get<{}, Recommendation[] | string>(
