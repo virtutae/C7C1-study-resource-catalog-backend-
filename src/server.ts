@@ -181,11 +181,11 @@ app.post<{}, string, { user_id: number; url: string; is_like: boolean }>(
     }
 );
 
-app.delete<{}, string, { user_id: number; url: string }>(
-    "/votes",
+app.delete<{ user_id: number; url: string }, string>(
+    "/votes/:user_id/:url",
     async (req, res) => {
         try {
-            const { user_id, url } = req.body;
+            const { user_id, url } = req.params;
             await deleteVote(client, user_id, url);
             res.status(200).json("Vote deleted");
         } catch (error) {
