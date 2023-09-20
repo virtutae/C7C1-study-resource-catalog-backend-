@@ -2,21 +2,23 @@ import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import morgan from "morgan";
 import { Client } from "pg";
 import {
+    deleteStudyListEntry,
     deleteVote,
     getRecentTenRecommmendations,
-    getRecommendationsFiltered,
-    getTagCloud,
     getRecommendationUrl,
+    getRecommendationsFiltered,
+    getStudyListForUser,
+    getTagCloud,
+    getUsers,
+    getVotes,
     postComment,
     postRecommendation,
+    postStudyListEntry,
     postTags,
     upsertVote,
-    getUsers,
-    getStudyListForUser,
-    postStudyListEntry,
-    deleteStudyListEntry,
 } from "./db";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
@@ -24,7 +26,6 @@ import {
     Recommendation,
     RecommendationCandidate,
 } from "./types/Recommendation";
-import morgan from "morgan";
 import { Tag } from "./types/Tag";
 import { User } from "./types/User";
 
@@ -167,6 +168,23 @@ app.post<
 });
 
 // VOTES ROUTES
+app.get<
+    { url: string },
+    { newLikeCount: number; newDislikeCount: number } | string
+>("/votes/:url", async (req, res) => {
+    try {
+        const url = req.params.url;
+        const votesCount = {
+            newLikeCount: await getVotes(client, url, true),
+            newDislikeCount: await getVotes(client, url, false),
+        };
+        res.status(200).json(votesCount);
+    } catch (error) {
+        console.error("Error post request for /votes/:url", error);
+        res.status(500).send("An error occurred. Check server logs.");
+    }
+});
+
 app.post<{}, string, { user_id: number; url: string; is_like: boolean }>(
     "/votes",
     async (req, res) => {
