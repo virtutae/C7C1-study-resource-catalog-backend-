@@ -15,7 +15,11 @@ export interface Recommendation {
     tags: string;
     likes: number;
     dislikes: number;
+    thumbnail_url: string;
 }
 
 export interface RecommendationCandidate
-    extends Omit<Recommendation, "creation_date" | "likes" | "dislikes"> {}
+    extends Omit<
+        Recommendation,
+        "creation_date" | "likes" | "dislikes" | "thumbnail_url"
+    > {}

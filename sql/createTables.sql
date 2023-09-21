@@ -107,3 +107,10 @@ LEFT JOIN (
 ) AS tags ON r.url = tags.url
 ORDER BY r.creation_date DESC LIMIT 10;
 
+
+DROP TABLE IF EXISTS thumbnails;
+CREATE TABLE thumbnails (
+  id serial primary key,
+  thumbnail_url varchar NOT NULL,  
+  url varchar NOT NULL UNIQUE,
+  FOREIGN KEY (url) REFERENCES recommendations (url))

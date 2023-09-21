@@ -5,10 +5,11 @@ import {
     createSearchTermQuery,
 } from "../utils/createSearchQuery";
 import { createSqlParams, createSqlValues } from "../utils/createTagsQuery";
+import axios from "axios";
 
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
-        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
+        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags, COALESCE(thumbnails.thumbnail_url, '') AS thumbnail_url
         FROM recommendations r
         LEFT JOIN (
             SELECT url, COUNT(*) AS like_count
@@ -27,6 +28,10 @@ export async function getRecentTenRecommmendations(client: Client) {
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
+LEFT JOIN (
+    SELECT url, thumbnail_url
+    FROM thumbnails
+) AS thumbnails ON r.url = thumbnails.url
         ORDER BY r.creation_date DESC LIMIT 10;`
     );
 
@@ -43,7 +48,7 @@ export async function getRecommendationsFiltered(
     const searchTermQuery = createSearchTermQuery(searchTerm);
 
     const result = await client.query(
-        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
+        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags, COALESCE(thumbnails.thumbnail_url, '') AS thumbnail_url
         FROM recommendations r
         LEFT JOIN (
             SELECT url, COUNT(*) AS like_count
@@ -62,6 +67,10 @@ export async function getRecommendationsFiltered(
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
+        LEFT JOIN (
+            SELECT url, thumbnail_url
+            FROM thumbnails
+        ) AS thumbnails ON r.url = thumbnails.url
         WHERE (${searchTagsQuery}) AND (${searchTermQuery})
         ;`
     );
@@ -132,5 +141,26 @@ export async function postTags(client: Client, tags: string, url: string) {
         sqlParams
     );
 
+    return result;
+}
+
+export async function postThumbnail(client: Client, url: string) {
+    const response = await axios.get(
+        `https://open-graph.p.rapidapi.com/?url=${encodeURIComponent(url)}`,
+        {
+            headers: {
+                "X-RapidAPI-Host": "og-link-preview.p.rapidapi.com",
+                "X-RapidAPI-Key":
+                    "e1f95d8691msh5bf6699c07745c1p178170jsnede623889b78",
+            },
+        }
+    );
+    const newThumbnail = response.data.cover
+        ? response.data.cover
+        : "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGxlYXJuaW5nfGVufDB8fDB8fHww&auto=format&fit=crop&w=600&q=60";
+    const result = await client.query(
+        "INSERT INTO thumbnails (thumbnail_url,url) VALUES ($1,$2) RETURNING *;",
+        [newThumbnail, url]
+    );
     return result;
 }
