@@ -144,3 +144,7 @@ INSERT INTO study_list (user_id, url) VALUES (2, 'https://www.codecademy.com/lea
 (3, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
 (4, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
 (2, 'https://start.spring.io/');
+
+
+INSERT INTO thumbnails (thumbnail_url,url) VALUES 
+('https://images.codecademy.com/social/logo-codecademy-social.png', 'https://www.codecademy.com/')
