@@ -62,7 +62,7 @@ export async function getRecommendationsFiltered(
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
-        WHERE ${searchTagsQuery} AND ${searchTermQuery}
+        WHERE (${searchTagsQuery}) AND (${searchTermQuery})
         ;`
     );
 
