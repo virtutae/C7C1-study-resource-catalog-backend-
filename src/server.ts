@@ -26,7 +26,7 @@ import {
     postStudyListEntry,
     deleteStudyListEntry,
 } from "./db/studyList";
-import { getTagCloud } from "./db/tag-cloud";
+import { getTagCloud } from "./db/tagCloud";
 import { getUsers, getUserName } from "./db/users";
 import { getVotes, upsertVote, deleteVote } from "./db/votes";
 
