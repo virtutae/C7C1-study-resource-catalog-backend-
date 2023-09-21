@@ -110,7 +110,7 @@ ORDER BY r.creation_date DESC LIMIT 10;
 
 DROP TABLE IF EXISTS thumbnails;
 CREATE TABLE thumbnails (
-  thumbnail_id serial primary key,
+  id serial primary key,
   thumbnail_url varchar NOT NULL,  
   url varchar NOT NULL UNIQUE,
   FOREIGN KEY (url) REFERENCES recommendations (url))

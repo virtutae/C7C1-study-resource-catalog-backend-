@@ -20,6 +20,7 @@ import {
     getRecommendationUrl,
     postRecommendation,
     postTags,
+    postThumbnail,
 } from "./db/recommendations";
 import {
     getStudyListForUser,
@@ -136,12 +137,12 @@ app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
 app.post<{}, {}, { recommendation: RecommendationCandidate }>(
     "/recommendation",
     async (req, res) => {
+        const recommendation = req.body.recommendation;
         try {
-            const recommendation = req.body.recommendation;
             await postRecommendation(client, recommendation);
-
             const { url, tags } = recommendation;
             await postTags(client, tags, url);
+            await postThumbnail(client, url);
 
             await axios.post(
                 "https://discord.com/api/webhooks/1153278935187062794/FpxDzjkcGrJvWvzJAS7wELMSbtNUOWETgYdi__YcRR_F2cxp5ZH3Nfd5jHOay3LpCHrS",
@@ -279,6 +280,7 @@ app.delete("/study-list", async (req, res) => {
         res.status(500).send("An error occurred. Check server logs.");
     }
 });
+
 // GENERAL ROUTES
 app.get<{}, string>("/health-check", async (_req, res) => {
     try {

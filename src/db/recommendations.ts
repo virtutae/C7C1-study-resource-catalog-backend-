@@ -5,6 +5,7 @@ import {
     createSearchTermQuery,
 } from "../utils/createSearchQuery";
 import { createSqlParams, createSqlValues } from "../utils/createTagsQuery";
+import axios from "axios";
 
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
@@ -140,5 +141,26 @@ export async function postTags(client: Client, tags: string, url: string) {
         sqlParams
     );
 
+    return result;
+}
+
+export async function postThumbnail(client: Client, url: string) {
+    const response = await axios.get(
+        `https://open-graph.p.rapidapi.com/?url=${encodeURIComponent(url)}`,
+        {
+            headers: {
+                "X-RapidAPI-Host": "og-link-preview.p.rapidapi.com",
+                "X-RapidAPI-Key":
+                    "e1f95d8691msh5bf6699c07745c1p178170jsnede623889b78",
+            },
+        }
+    );
+    const newThumbnail = response.data.cover
+        ? response.data.cover
+        : "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGxlYXJuaW5nfGVufDB8fDB8fHww&auto=format&fit=crop&w=600&q=60";
+    const result = await client.query(
+        "INSERT INTO thumbnails (thumbnail_url,url) VALUES ($1,$2) RETURNING *;",
+        [newThumbnail, url]
+    );
     return result;
 }
