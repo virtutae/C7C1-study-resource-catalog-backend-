@@ -8,7 +8,7 @@ import { createSqlParams, createSqlValues } from "../utils/createTagsQuery";
 
 export async function getRecentTenRecommmendations(client: Client) {
     const result = await client.query(
-        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
+        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags, COALESCE(thumbnails.thumbnail_url, '') AS thumbnail_url
         FROM recommendations r
         LEFT JOIN (
             SELECT url, COUNT(*) AS like_count
@@ -27,6 +27,10 @@ export async function getRecentTenRecommmendations(client: Client) {
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
+LEFT JOIN (
+    SELECT url, thumbnail_url
+    FROM thumbnails
+) AS thumbnails ON r.url = thumbnails.url
         ORDER BY r.creation_date DESC LIMIT 10;`
     );
 
@@ -43,7 +47,7 @@ export async function getRecommendationsFiltered(
     const searchTermQuery = createSearchTermQuery(searchTerm);
 
     const result = await client.query(
-        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags
+        `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count, COALESCE(tags.tag_list, '') AS tags, COALESCE(thumbnails.thumbnail_url, '') AS thumbnail_url
         FROM recommendations r
         LEFT JOIN (
             SELECT url, COUNT(*) AS like_count
@@ -62,6 +66,10 @@ export async function getRecommendationsFiltered(
             FROM tags
             GROUP BY url
         ) AS tags ON r.url = tags.url
+        LEFT JOIN (
+            SELECT url, thumbnail_url
+            FROM thumbnails
+        ) AS thumbnails ON r.url = thumbnails.url
         WHERE (${searchTagsQuery}) AND (${searchTermQuery})
         ;`
     );
