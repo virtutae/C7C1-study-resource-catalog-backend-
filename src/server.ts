@@ -4,24 +4,6 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import { Client } from "pg";
-import {
-    deleteStudyListEntry,
-    deleteVote,
-    getCommentsFromRecommendation,
-    getRecentTenRecommmendations,
-    getRecommendationUrl,
-    getRecommendationsFiltered,
-    getStudyListForUser,
-    getTagCloud,
-    getUserName,
-    getUsers,
-    getVotes,
-    postComment,
-    postRecommendation,
-    postStudyListEntry,
-    postTags,
-    upsertVote,
-} from "./db";
 import { getEnvVarOrFail } from "./support/envVarUtils";
 import { setupDBClientConfig } from "./support/setupDBClientConfig";
 import {
@@ -31,6 +13,22 @@ import {
 import { Tag } from "./types/Tag";
 import { User } from "./types/User";
 import { RecommendationComment } from "./types/RecommendationComment";
+import { getCommentsFromRecommendation, postComment } from "./db/comments";
+import {
+    getRecentTenRecommmendations,
+    getRecommendationsFiltered,
+    getRecommendationUrl,
+    postRecommendation,
+    postTags,
+} from "./db/recommendations";
+import {
+    getStudyListForUser,
+    postStudyListEntry,
+    deleteStudyListEntry,
+} from "./db/studyList";
+import { getTagCloud } from "./db/tagCloud";
+import { getUsers, getUserName } from "./db/users";
+import { getVotes, upsertVote, deleteVote } from "./db/votes";
 
 dotenv.config(); //Read .env file lines as though they were env vars.
 
