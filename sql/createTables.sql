@@ -56,6 +56,7 @@ CREATE TABLE study_list (
 	user_id int NOT NULL,
   	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   	url varchar NOT NULL,
+  	creation_date timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (url) REFERENCES recommendations(url) ON DELETE CASCADE, 
   PRIMARY KEY (user_id, url)
 );
