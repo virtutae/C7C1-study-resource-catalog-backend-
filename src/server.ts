@@ -185,20 +185,19 @@ app.get<{ url: string }, RecommendationComment[] | string>(
     }
 );
 
-app.post<
-    {},
-    string,
-    { user_id: number; recommendation_url: string; text: string }
->("/comments", async (req, res) => {
-    try {
-        const { user_id, recommendation_url, text } = req.body;
-        await postComment(client, user_id, recommendation_url, text);
-        res.status(200).json("New comment added");
-    } catch (error) {
-        console.error("Error post request for /comments/", error);
-        res.status(500).send("An error occurred. Check server logs.");
+app.post<{}, string, { user_id: number; url: string; text: string }>(
+    "/comments",
+    async (req, res) => {
+        try {
+            const { user_id, url, text } = req.body;
+            await postComment(client, user_id, url, text);
+            res.status(200).json("New comment added");
+        } catch (error) {
+            console.error("Error post request for /comments/", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
     }
-});
+);
 
 // VOTES ROUTES
 app.get<

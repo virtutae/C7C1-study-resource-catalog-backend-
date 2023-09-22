@@ -20,12 +20,12 @@ export async function getCommentsFromRecommendation(
 export async function postComment(
     client: Client,
     user_id: number,
-    recommendation_url: string,
+    url: string,
     text: string
 ) {
     const result = await client.query(
-        "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
-        [user_id, recommendation_url, text]
+        "INSERT INTO comments(user_id, url, text) VALUES ($1, $2, $3);",
+        [user_id, url, text]
     );
 
     return result;
