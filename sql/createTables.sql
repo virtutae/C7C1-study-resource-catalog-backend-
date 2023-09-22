@@ -42,12 +42,13 @@ CREATE TABLE votes (
 
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
-    comment_id SERIAL PRIMARY KEY ,
+    id SERIAL PRIMARY KEY ,
   	user_id int NOT NULL,
   	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    recommendation_url varchar NOT NULL,
-    FOREIGN KEY (recommendation_url) REFERENCES recommendations(url) ON DELETE CASCADE,
-    text varchar (500) NOT NULL
+    url varchar NOT NULL,
+    FOREIGN KEY (url) REFERENCES recommendations(url) ON DELETE CASCADE,
+    text varchar (500) NOT NULL,
+	  creation_date timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 DROP TABLE IF EXISTS study_list;

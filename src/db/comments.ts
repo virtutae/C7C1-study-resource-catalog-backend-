@@ -10,7 +10,7 @@ export async function getCommentsFromRecommendation(
         LEFT JOIN users as u
             ON c.user_id = u.id
         WHERE recommendation_url = $1
-        ORDER BY u.id DESC;`,
+        ORDER BY u.creation_date DESC;`,
         [url]
     );
 
@@ -20,12 +20,12 @@ export async function getCommentsFromRecommendation(
 export async function postComment(
     client: Client,
     user_id: number,
-    recommendation_url: string,
+    url: string,
     text: string
 ) {
     const result = await client.query(
-        "INSERT INTO comments(user_id, recommendation_url, text) VALUES ($1, $2, $3);",
-        [user_id, recommendation_url, text]
+        "INSERT INTO comments(user_id, url, text) VALUES ($1, $2, $3);",
+        [user_id, url, text]
     );
 
     return result;
