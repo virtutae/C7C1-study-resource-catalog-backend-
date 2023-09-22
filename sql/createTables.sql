@@ -29,7 +29,6 @@ CREATE TABLE recommendations(
 
 
 DROP TABLE IF EXISTS votes;
-
 CREATE TABLE votes (
     user_id int NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -67,12 +66,12 @@ CREATE TABLE tags_cloud (
 tag_name varchar(50) PRIMARY KEY 
 );
 
-DROP TABLE IF EXISTS tag_recommendation;
+DROP TABLE IF EXISTS tags;
 CREATE TABLE tags (
 	tag_name varchar ,
   	url varchar ,
-  	FOREIGN KEY (tag_name) REFERENCES tags_cloud (tag_name),
-  	FOREIGN KEY (url) REFERENCES recommendations (url),
+  	FOREIGN KEY (tag_name) REFERENCES tags_cloud (tag_name) ON DELETE CASCADE,
+  	FOREIGN KEY (url) REFERENCES recommendations (url) ON DELETE CASCADE,
   PRIMARY KEY (tag_name, url)
 );
 
@@ -115,4 +114,5 @@ CREATE TABLE thumbnails (
   id serial primary key,
   thumbnail_url varchar NOT NULL,  
   url varchar NOT NULL UNIQUE,
-  FOREIGN KEY (url) REFERENCES recommendations (url))
+  FOREIGN KEY (url) REFERENCES recommendations (url) ON DELETE CASCADE
+  );
