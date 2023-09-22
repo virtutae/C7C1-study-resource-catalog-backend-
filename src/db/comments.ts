@@ -9,7 +9,7 @@ export async function getCommentsFromRecommendation(
         FROM comments as c
         LEFT JOIN users as u
             ON c.user_id = u.id
-        WHERE recommendation_url = $1
+        WHERE url = $1
         ORDER BY u.creation_date DESC;`,
         [url]
     );
