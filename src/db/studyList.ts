@@ -23,7 +23,8 @@ export async function getStudyListForUser(client: Client, user_id: number) {
                     GROUP BY url
                 ) AS tags ON r.url = tags.url
                LEFT JOIN study_list s ON r.url = s.url
-               WHERE s.user_id = $1`,
+               WHERE s.user_id = $1
+               ORDER BY s.creation_date DESC;`,
         [user_id]
     );
     return result;
