@@ -3,7 +3,7 @@ import { Client } from "pg";
 export async function getStudyListForUser(client: Client, user_id: number) {
     const result = await client.query(
         `SELECT r.*, COALESCE(likes.like_count, 0) AS like_count, COALESCE(dislikes.dislike_count, 0) AS dislike_count,
-        COALESCE(tags.tag_list, '') AS tags
+        COALESCE(tags.tag_list, '') AS tags, COALESCE(thumbnails.thumbnail_url, '') AS thumbnail_url
                 FROM recommendations r
                 LEFT JOIN (
                     SELECT url, COUNT(*) AS like_count
@@ -22,6 +22,10 @@ export async function getStudyListForUser(client: Client, user_id: number) {
                     FROM tags
                     GROUP BY url
                 ) AS tags ON r.url = tags.url
+                LEFT JOIN (
+                    SELECT url, thumbnail_url
+                    FROM thumbnails
+                ) AS thumbnails ON r.url = thumbnails.url
                LEFT JOIN study_list s ON r.url = s.url
                WHERE s.user_id = $1
                ORDER BY s.creation_date DESC;`,
