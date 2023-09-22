@@ -12,7 +12,6 @@ CREATE TABLE recommendations(
     name varchar(255) NOT NULL,
     author varchar(255) NOT NULL,
     description varchar NOT NULL,
-  	tags varchar NOT NULL,
     content_type varchar(255) NOT NULL,
     build_phase varchar(255) NOT NULL,
     creation_date timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
