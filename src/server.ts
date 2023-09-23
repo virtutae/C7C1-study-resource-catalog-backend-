@@ -44,12 +44,14 @@ app.use(cors()); //add CORS support to each following route handler
 
 app.use(morgan("tiny"));
 
-app.get("/", async (_req, res) => {
-    res.json({ msg: "Hello! There's nothing interesting for GET /" });
+app.get<{}, string, {}>("/", async (_req, res) => {
+    res.status(200).send(
+        "Hello! Available APIs documented in https://documenter.getpostman.com/view/28881704/2s9YC8upwp"
+    );
 });
 
 // USERS ROUTES
-app.get<{}, User[] | string>("/users", async (_req, res) => {
+app.get<{}, User[] | string, {}>("/users", async (_req, res) => {
     try {
         const { rows } = await getUsers(client);
         res.status(200).json(rows);
@@ -59,7 +61,7 @@ app.get<{}, User[] | string>("/users", async (_req, res) => {
     }
 });
 
-app.get<{ user_id: string }, { user_name: string } | string>(
+app.get<{ user_id: string }, { user_name: string } | string, {}>(
     "/users/:user_id",
     async (req, res) => {
         try {
@@ -77,7 +79,7 @@ app.get<{ user_id: string }, { user_name: string } | string>(
 );
 
 // RECOMMENDATION ROUTES
-app.get<{}, Recommendation[] | string>(
+app.get<{}, Recommendation[] | string, {}>(
     "/recommendation/recent10",
     async (_req, res) => {
         try {
@@ -93,7 +95,29 @@ app.get<{}, Recommendation[] | string>(
     }
 );
 
-app.get<{ search: string; tags: string }, Recommendation[] | string>(
+app.get<{ url: string }, string, {}>(
+    "/recommendation/validate/:url",
+    async (req, res) => {
+        try {
+            console.log("got here");
+            const { url } = req.params;
+            const { rowCount } = await getRecommendationUrl(client, url);
+            if (rowCount === 0) {
+                res.status(201).json("Valid URL");
+            } else {
+                res.status(202).json("URL already exists");
+            }
+        } catch (error) {
+            console.error(
+                "Error get request for /recommendation/validate/:url",
+                error
+            );
+            res.status(500).send("An error occurred. Check server logs.");
+        }
+    }
+);
+
+app.get<{ search: string; tags: string }, Recommendation[] | string, {}>(
     "/recommendation/:search/:tags",
     async (req, res) => {
         const searchTerm =
@@ -118,21 +142,6 @@ app.get<{ search: string; tags: string }, Recommendation[] | string>(
         }
     }
 );
-
-app.post<{}, {}, { url: string }>("/recommendation/url", async (req, res) => {
-    try {
-        const url = req.body.url;
-        const { rowCount } = await getRecommendationUrl(client, url);
-        if (rowCount === 0) {
-            res.status(201).json("Valid URL");
-        } else {
-            res.status(202).json("URL already exists");
-        }
-    } catch (error) {
-        console.error("Error get request for /recommendation/new/:url", error);
-        res.status(500).send("An error occurred. Check server logs.");
-    }
-});
 
 app.post<{}, {}, { recommendation: RecommendationCandidate }>(
     "/recommendation",
@@ -160,7 +169,7 @@ app.post<{}, {}, { recommendation: RecommendationCandidate }>(
 );
 
 // TAG-CLOUD ROUTES
-app.get<{}, Tag[] | string>("/tag-cloud", async (_req, res) => {
+app.get<{}, Tag[] | string, {}>("/tag-cloud", async (_req, res) => {
     try {
         const { rows } = await getTagCloud(client);
         res.status(200).json(rows);
@@ -171,7 +180,7 @@ app.get<{}, Tag[] | string>("/tag-cloud", async (_req, res) => {
 });
 
 // COMMENTS ROUTES
-app.get<{ url: string }, RecommendationComment[] | string>(
+app.get<{ url: string }, RecommendationComment[] | string, {}>(
     "/comments/:url",
     async (req, res) => {
         try {
@@ -202,7 +211,8 @@ app.post<{}, string, { user_id: number; url: string; text: string }>(
 // VOTES ROUTES
 app.get<
     { url: string },
-    { newLikeCount: number; newDislikeCount: number } | string
+    { newLikeCount: number; newDislikeCount: number } | string,
+    {}
 >("/votes/:url", async (req, res) => {
     try {
         const url = req.params.url;
@@ -231,7 +241,7 @@ app.post<{}, string, { user_id: number; url: string; is_like: boolean }>(
     }
 );
 
-app.delete<{ user_id: number; url: string }, string>(
+app.delete<{ user_id: number; url: string }, string, {}>(
     "/votes/:user_id/:url",
     async (req, res) => {
         try {
@@ -246,42 +256,50 @@ app.delete<{ user_id: number; url: string }, string>(
 );
 
 //STUDY-VIEW ROUTES
-
-app.get("/study-list/:user_id", async (req, res) => {
-    try {
-        const user_id = parseInt(req.params.user_id);
-        const { rows } = await getStudyListForUser(client, user_id);
-        res.status(200).json(rows);
-    } catch (error) {
-        console.error("Error get request for /study-list/:user_id", error);
-        res.status(500).send("An error occurred. Check server logs.");
+app.get<{ user_id: string }, Recommendation[] | string, {}>(
+    "/study-list/:user_id",
+    async (req, res) => {
+        try {
+            const user_id = parseInt(req.params.user_id);
+            const { rows } = await getStudyListForUser(client, user_id);
+            res.status(200).json(rows);
+        } catch (error) {
+            console.error("Error get request for /study-list/:user_id", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
     }
-});
+);
 
-app.post("/study-list", async (req, res) => {
-    try {
-        const { user_id, url } = req.body;
-        await postStudyListEntry(client, user_id, url);
-        res.status(200).json("Added new study list entry");
-    } catch (error) {
-        console.error("Error post request for /study-list/", error);
-        res.status(500).send("An error occurred. Check server logs.");
+app.post<{}, string, { user_id: number; url: string }>(
+    "/study-list",
+    async (req, res) => {
+        try {
+            const { user_id, url } = req.body;
+            await postStudyListEntry(client, user_id, url);
+            res.status(200).json("Added new study list entry");
+        } catch (error) {
+            console.error("Error post request for /study-list/", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
     }
-});
+);
 
-app.delete("/study-list", async (req, res) => {
-    try {
-        const { user_id, url } = req.body;
-        await deleteStudyListEntry(client, user_id, url);
-        res.status(200).json("Deleted study list entry");
-    } catch (error) {
-        console.error("Error in delete request for /study-list/", error);
-        res.status(500).send("An error occurred. Check server logs.");
+app.delete<{ user_id: string; url: string }, string, {}>(
+    "/study-list/:user_id/:url",
+    async (req, res) => {
+        try {
+            const { user_id, url } = req.params;
+            await deleteStudyListEntry(client, parseInt(user_id), url);
+            res.status(200).json("Deleted study list entry");
+        } catch (error) {
+            console.error("Error in delete request for /study-list/", error);
+            res.status(500).send("An error occurred. Check server logs.");
+        }
     }
-});
+);
 
 // GENERAL ROUTES
-app.get<{}, string>("/health-check", async (_req, res) => {
+app.get<{}, string, {}>("/health-check", async (_req, res) => {
     try {
         //For this to be successful, must connect to db
         await client.query("select now()");
