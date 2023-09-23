@@ -1,50 +1,28 @@
-INSERT INTO votes (user_id, url, is_like) VALUES (14, 'https://start.spring.io/', true);
-(13, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', true),
-(11, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', true),
-(14, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', true),
+INSERT INTO users (user_name, is_faculty) VALUES 
+('Adil', false),
+('Ana', false),
+('Beth', false),
+('Carlton', false),
+('Cynthia', false),
+('Dani', false),
+('Henry', false),
+('HoKei', false),
+('Julieta', false),
+('Laura', false),
+('Oskar', false),
+('Rosie', false),
+('Silviu', false),
+('Stephanie', false),
+('Tom', false),
+('Tomasz', false),
+('Viky', false),
+('Łucja', false),
+('Neill', true),
+('Katie', true),
+('Nico', true),
+('Marta', true);
 
-(1, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', null),
-(2, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', false),
-(3, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet', false);
-
-INSERT INTO recommendations (
-        url,
-        name,
-        author,
-        description,
-        content_type,
-        build_phase,
-        creation_date,
-        user_id,
-        recommendation_type,
-        reason
-    )
-VALUES(
-        'https://start.spring.io/',
-        'Spring-docker',
-        'Codecademy',
-        'Cheatsheet on how to use classes in JS',
-        'article',
-        'week 11',
-        CURRENT_TIMESTAMP,
-        1,
-        'I haven''t used this resource but it looks promising',
-        'I think it''s useful'
-    ), 
-    (
-        'https://katalon.com/resources-center/blog/end-to-end-e2e-testing',
-        'E2E testing',
-        'Codecademy',
-        'Cheatsheet on how to use classes in JS',
-        'article',
-        'week 11',
-        CURRENT_TIMESTAMP,
-        2,
-        'I haven''t used this resource but it looks promising',
-        'I think it''s useful'
-    );
-
-    INSERT INTO tags_cloud (tag_name) VALUES 
+INSERT INTO tags_cloud (tag_name) VALUES 
 ('#JavaScript'),
 ('#TypeScript'),
 ('#Front-End-Development'),
@@ -87,8 +65,7 @@ VALUES(
 ('#DB'),
 ('#HTTP-requests');
 
-
-  INSERT INTO recommendations (
+INSERT INTO recommendations (
         url,
         name,
         author,
@@ -99,52 +76,180 @@ VALUES(
         user_id,
         recommendation_type,
         reason
-    )
-VALUES(
-        'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet',
-        'Classes in JS',
-        'Codecademy',
-        'Cheatsheet on how to use classes in JS',
-        'article',
-        'week 11',
-        CURRENT_TIMESTAMP,
-        13,
-        'I haven''t used this resource but it looks promising',
-        'I think it''s useful'
-    );
+) VALUES 
+(
+    'https://youtu.be/kK_Wqx3RnHk',
+    'useReducer',
+    'Web Dev Simplified',
+    'This YTer has some nice tutorials on React and I found his useReducer one (with the article in description) helped me get to grips with it. useImmerReducer is nice too once you have learned useReducer (I''m only getting to grips with it now!)',
+    'video',
+    'Week 7',
+    CURRENT_TIMESTAMP,
+    15,
+    'I recommend this resource after having used it',
+    'useReducer video that helped me learn'
+),
+(
+    'https://www.youtube.com/watch?v=NFdS7cSnNc8',
+    'validation with Zod',
+    'basarat',
+    '4-minute intro to validation with Zod',
+    'video',
+    'week 10',
+    CURRENT_TIMESTAMP,
+    19,
+    'I recommend this resource after having used it',
+    'Good value for time'
+),
+(
+    'https://devtoolstips.org/',
+    'devtools tips',
+    'DevTools Tips',
+    '150 devtools tips',
+    'Article',
+    'Week 7',
+    CURRENT_TIMESTAMP,
+    19,
+    'I recommend this resource after having used it',
+    'Learn best practices'
+),
+(
+    'https://www.codecademy.com/learn/learn-git',
+    'Git and GitHub',
+    'Codecademy',
+    'Short course on how to use Git and GitHub for version control',
+    'Course',
+    'Week 1',
+    CURRENT_TIMESTAMP,
+    7,
+    'I recommend this resource after having used it',
+    'I thought I would share this short course from Codecademy on Git and GitHub, I found it easy to follow and was very useful for starting to use version control.'
+),
+(
+    'https://www.kenney.nl/',
+    'Asset resources',
+    'Kenney',
+    'Asset resources (for games/sketches)',
+    'Assets',
+    'Week 5',
+    CURRENT_TIMESTAMP,
+    15,
+    'I haven''t used this resource but it looks promising',
+    'Really nice assets'
+),
+(
+    'https://www.w3schools.com/js/js_precedence.asp',
+    'JS Operator Precedence',
+    'w3schools',
+    'For folks that are on the beginning of the journey and want to build solid fundamentals',
+    'Article',
+    'Week 2',
+    CURRENT_TIMESTAMP,
+    17,
+    'I recommend this resource after having used it',
+    'I found the link below useful to sum up different types of operators in JS and learn about their precedence. It''s on the foundation level - but it has examples and helps solidify the knowledge.'
+),
+(
+    'https://learngitbranching.js.org/',
+    'Git Branching',
+    'Learn Git Branching',
+    'Git Branching Exercises\nNOTE There are 2 tabs at the top for Main and Remote.',
+    'Course',
+    'Week 1',
+    CURRENT_TIMESTAMP,
+    4,
+    'I recommend this resource after having used it',
+    'Here''s a cool interactive web application for learning and visualizing git branching!'
+),
+(
+    'https://docs.cypress.io/guides/end-to-end-testing/testing-your-app',
+    'Cypress Documentation',
+    'Cypress',
+    'Cypress official documentation',
+    'Documentation',
+    'Week 13',
+    CURRENT_TIMESTAMP,
+    2,
+    'I do not recommend this resource, having used it',
+    'Hard to follow along'
+),
+(
+    'https://tsch.js.org/',
+    'Typescript Challenges',
+    'Unknown',
+    'Collection of TypeScript type challenges with an online judge',
+    'Website',
+    'Week 2',
+    CURRENT_TIMESTAMP,
+    9,
+    'I haven''t used this resource but it looks promising',
+    'My mentor recommended it to me'
+),
+(
+    'https://www.freecodecamp.org/news/how-to-use-react-router-version-6/',
+    'React Router',
+    'freeCodeCamp',
+    'In this tutorial, we''ll talk about what React Router is and how to use it.',
+    'Tutorial',
+    'Week 14',
+    CURRENT_TIMESTAMP,
+    15,
+    'I recommend this resource after having used it',
+    'In case anyone is looking to use React router to add linkable components/pages to their react app - I found that this guide was quick and easy to follow for setting it up.'
+),
+(
+    'https://www.youtube.com/watch?v=1jHUY3qoBu8',
+    'low-poly modeling ',
+    'Imphenzia',
+    'Here''s my recommendation for a first blender tutorial: imphenzia''s low-poly modeling - aimed at developing assets for low-poly style games, primarily.',
+    'Video',
+    'Week 9',
+    CURRENT_TIMESTAMP,
+    15,
+    'I recommend this resource after having used it',
+    'This is an easy style to pull off, which doesn''t require lots of finessing and works great on a low-powered computer.'
+);
 
-    INSERT INTO users (user_name, is_faculty)
-VALUES ('Adil', false),
-    ('Ana', false),
-('Beth', false),
-('Carlton', false),
-('Cynthia', false),
-('Dani', false),
-    ('Henry', false),
-('HoKei', false),
-('Julieta', false),
-('Laura', false),
-('Oskar', false),
-    ('Rosie', false),
-('Silviu', false),
-('Stephanie', false),
-('Tom', false),
-('Tomasz', false),
-('Viky', false),
-('Łucja', false),
-    ('Neill', true),
-('Katie', true),
-('Nico', true),
-('Marta', true);
+INSERT INTO tags (tag_name, url) VALUES
+('#JavaScript', 'https://youtu.be/kK_Wqx3RnHk'),
+('#Promises', 'https://www.youtube.com/watch?v=NFdS7cSnNc8'),
+('#Web-Development', 'https://devtoolstips.org/'),
+('#GIT', 'https://www.codecademy.com/learn/learn-git'),
+('#Front-End-Development', 'https://www.kenney.nl/'),
+('#JavaScript', 'https://www.w3schools.com/js/js_precedence.asp'),
+('#GIT', 'https://learngitbranching.js.org/'),
+('#JavaScript-Testing', 'https://docs.cypress.io/guides/end-to-end-testing/testing-your-app'),
+('#TypeScript', 'https://tsch.js.org/'),
+('#Express.js', 'https://www.freecodecamp.org/news/how-to-use-react-router-version-6/'),
+('#Programming', 'https://www.youtube.com/watch?v=1jHUY3qoBu8');
 
-INSERT INTO tags (tag_name, url) VALUES ('#React', 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
-('#JavaScript', 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet');
+INSERT INTO thumbnails (thumbnail_url, url) VALUES 
+('https://i.ytimg.com/vi/kK_Wqx3RnHk/maxresdefault.jpg', 'https://youtu.be/kK_Wqx3RnHk'),
+('https://i.ytimg.com/vi/NFdS7cSnNc8/maxresdefault.jpg', 'https://www.youtube.com/watch?v=NFdS7cSnNc8'),
+('http://devtoolstips.org/assets/logo.png', 'https://devtoolstips.org/'),
+('https://static-assets.codecademy.com/assets/course-landing-page/meta/16x9/learn-git.jpg', 'https://www.codecademy.com/learn/learn-git'),
+('https://www.kenney.nl/data/img/kenney-promo.png', 'https://www.kenney.nl/'),
+('https://www.w3schools.com/images/w3schools_logo_436_2.png', 'https://www.w3schools.com/js/js_precedence.asp'),
+('https://pcottle.github.io/learnGitBranching/assets/learnGitBranching.png', 'https://learngitbranching.js.org/'),
+('https://docs.cypress.io/img/logo/cypress-logo-circle-dark.png', 'https://docs.cypress.io/guides/end-to-end-testing/testing-your-app'),
+('https://media.istockphoto.com/id/537331500/photo/programming-code-abstract-technology-background-of-software-deve.jpg?s=612x612&w=0&k=20&c=jlYes8ZfnCmD0lLn-vKvzQoKXrWaEcVypHnB5MuO-g8=', 'https://tsch.js.org/'),
+('https://www.freecodecamp.org/news/content/images/2021/12/react-router-cover.svg.png', 'https://www.freecodecamp.org/news/how-to-use-react-router-version-6/'),
+('https://i.ytimg.com/vi/1jHUY3qoBu8/maxresdefault.jpg', 'https://www.youtube.com/watch?v=1jHUY3qoBu8');
 
-INSERT INTO study_list (user_id, url) VALUES (2, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
-(3, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
-(4, 'https://www.codecademy.com/learn/webdev-intermediate-javascript/modules/learn-javascript-classes/cheatsheet'),
-(2, 'https://start.spring.io/');
+INSERT INTO votes (user_id, url, is_like) VALUES
+(5, 'https://devtoolstips.org/', true),
+(7, 'https://devtoolstips.org/', true),
+(9, 'https://devtoolstips.org/', true),
+(2, 'https://devtoolstips.org/', false),
+(2, 'https://learngitbranching.js.org/', false),
+(5, 'https://www.freecodecamp.org/news/how-to-use-react-router-version-6/', true),
+(12, 'https://www.freecodecamp.org/news/how-to-use-react-router-version-6/', false);
 
+INSERT INTO study_list (user_id, url) VALUES
+(1, 'https://youtu.be/kK_Wqx3RnHk'),
+(1, 'https://www.youtube.com/watch?v=NFdS7cSnNc8'),
+(1, 'https://devtoolstips.org/'),
+(1, 'https://tsch.js.org/');
 
-INSERT INTO thumbnails (thumbnail_url,url) VALUES 
-('https://images.codecademy.com/social/logo-codecademy-social.png', 'https://www.codecademy.com/')
+INSERT INTO comments (user_id, url, text) VALUES
+(1, 'https://youtu.be/kK_Wqx3RnHk', 'Very interesting!');
