@@ -26,6 +26,7 @@ import {
     getStudyListForUser,
     postStudyListEntry,
     deleteStudyListEntry,
+    isInStudyList,
 } from "./db/studyList";
 import { getTagCloud } from "./db/tagCloud";
 import { getUsers, getUserName } from "./db/users";
@@ -99,7 +100,6 @@ app.get<{ url: string }, string, {}>(
     "/recommendation/validate/:url",
     async (req, res) => {
         try {
-            console.log("got here");
             const { url } = req.params;
             const { rowCount } = await getRecommendationUrl(client, url);
             if (rowCount === 0) {
@@ -275,6 +275,10 @@ app.post<{}, string, { user_id: number; url: string }>(
     async (req, res) => {
         try {
             const { user_id, url } = req.body;
+            if (await isInStudyList(client, user_id, url)) {
+                res.status(200).json("Already in the study-list");
+                return;
+            }
             await postStudyListEntry(client, user_id, url);
             res.status(200).json("Added new study list entry");
         } catch (error) {
