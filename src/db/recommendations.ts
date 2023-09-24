@@ -125,7 +125,6 @@ export async function postRecommendation(
             reason,
         ]
     );
-
     return result;
 }
 
@@ -145,13 +144,13 @@ export async function postTags(client: Client, tags: string, url: string) {
 }
 
 export async function postThumbnail(client: Client, url: string) {
+    const rapidApiKey = process.env.X_RAPIDAPI_KEY;
     const response = await axios.get(
         `https://open-graph.p.rapidapi.com/?url=${encodeURIComponent(url)}`,
         {
             headers: {
                 "X-RapidAPI-Host": "og-link-preview.p.rapidapi.com",
-                "X-RapidAPI-Key":
-                    "e1f95d8691msh5bf6699c07745c1p178170jsnede623889b78",
+                "X-RapidAPI-Key": rapidApiKey,
             },
         }
     );
