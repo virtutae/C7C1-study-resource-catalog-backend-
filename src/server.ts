@@ -147,18 +147,16 @@ app.post<{}, {}, { recommendation: RecommendationCandidate }>(
     "/recommendation",
     async (req, res) => {
         const recommendation = req.body.recommendation;
+        const discordUrl = process.env.DISCORD_URL || "";
         try {
             await postRecommendation(client, recommendation);
             const { url, tags } = recommendation;
             await postTags(client, tags, url);
             await postThumbnail(client, url);
 
-            await axios.post(
-                "https://discord.com/api/webhooks/1153278935187062794/FpxDzjkcGrJvWvzJAS7wELMSbtNUOWETgYdi__YcRR_F2cxp5ZH3Nfd5jHOay3LpCHrS",
-                {
-                    content: `New Recommendation added:\nTitle: ${recommendation.name}\nLink: ${recommendation.url}`,
-                }
-            );
+            await axios.post(discordUrl, {
+                content: `New Recommendation added:\nTitle: ${recommendation.name}\nLink: ${recommendation.url}`,
+            });
 
             res.status(200).json("New recommendation added");
         } catch (error) {
