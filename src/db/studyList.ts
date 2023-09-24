@@ -56,3 +56,19 @@ export async function deleteStudyListEntry(
         [user_id, url]
     );
 }
+
+export async function isInStudyList(
+    client: Client,
+    user_id: number,
+    url: string
+) {
+    const response = await client.query(
+        "SELECT * FROM study_list WHERE user_id = $1 AND url = $2",
+        [user_id, url]
+    );
+    if (response.rowCount === 0) {
+        return false;
+    }
+
+    return true;
+}
