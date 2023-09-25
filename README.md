@@ -1,10 +1,4 @@
-# mark-fullstack-proj--starter-1
-
-## Usage:
-
-Instead of cloning this project, click "Use this template". This will allow you to create a repo on github which has this project's content but which is not a fork of it.
-
-Make sure you create the repo as being owned by your own account not by the WeAreAcademy organisation.
+# C7C1 Study Catalog - Backend
 
 ## Install
 
@@ -12,23 +6,33 @@ Make sure you create the repo as being owned by your own account not by the WeAr
 
 ## DB Setup
 
-Copy .env.example to .env and set `DATABASE_URL`, `LOCAL_DATABASE_URL` and `PORT` to your liking.
+-   Copy .env.example to .env and set `DATABASE_URL`, `LOCAL_DATABASE_URL` and `PORT` to your liking.
+-   You will need to create a user in the Rapid API website to obtain the `X_RAPIDAPI_KEY` and be able to get images for the thumbnails (if not, you will still get a standard image when the user creates a new recommendation). Please refer to https://docs.rapidapi.com/.
+-   Please link the corresponding `DISCORD_URL` in order to receive a notification when a new recommendation is posted.
 
 e.g.
 
 ```
 DATABASE_URL=postgres://someuser:somebigsecretpassword@somedbhost/pastebin
-LOCAL_DATABASE_URL=postgres://neill@localhost/pastebin
+LOCAL_DATABASE_URL=postgres://user@localhost/project
 PORT=4000
+X_RAPIDAPI_KEY=123456789examplekey
+DISCORD_URL=https://discord.com/api/webhooks/example/example123456789
 ```
 
-You will need to create your own databases for this project - certainly one remotely and ideally one locally, too, for development and testing.
+Tables that need to be created and the appropriate PostgreSQL queries are available in the path /sql/createTables.sql
+Example data/information is available in the path /sql/insertQueries.sql
 
-Hosts for postgres with a free offering include:
+Service chosen by the team for hosting our database in this project:
 
--   https://render.com
 -   https://www.elephantsql.com/
--   https://supabase.com/
+
+[Deployed backend ↗️](https://c7c1-study-resource-catalog.onrender.com/)
+
+## Sending requests using Postman
+
+You can find in the website below a list of the requests needed to test the paths on the server
+[Postman Requests ↗️](https://documenter.getpostman.com/view/28881704/2s9YC8upwp)
 
 ## Running locally
 
@@ -41,16 +45,3 @@ The env var LOCAL_DATABASE_URL will be consulted.
 `yarn start:dev-with-remote-db`
 
 The env var DATABASE_URL will be consulted.
-
-# Deploying to render.com
-
-To deploy to render.com:
-
--   build command should be `yarn && yarn build`
-
-## Running on render.com
-
-After deployment, render.com should be set up to run either `yarn start` or
-`node dist/server.js`
-
-The env var DATABASE_URL will be consulted and so must be set on render.com prior to application start.
