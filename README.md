@@ -6,9 +6,12 @@
 
 ## DB Setup
 
+Tables that need to be created and the appropriate PostgreSQL queries are available in the path /sql/createTables.sql
+Example data/information is available in the path /sql/insertQueries.sql
+
 -   Copy .env.example to .env and set `DATABASE_URL`, `LOCAL_DATABASE_URL` and `PORT` to your liking.
 -   You will need to create a user in the Rapid API website to obtain the `X_RAPIDAPI_KEY` and be able to get images for the thumbnails (if not, you will still get a standard image when the user creates a new recommendation). Please refer to https://docs.rapidapi.com/.
--   Please link the corresponding `DISCORD_URL` in order to receive a notification when a new recommendation is posted.
+-   Please link the corresponding discord webhook to `DISCORD_URL` in order to receive a notification when a new recommendation is posted.
 
 e.g.
 
@@ -19,9 +22,6 @@ PORT=4000
 X_RAPIDAPI_KEY=123456789examplekey
 DISCORD_URL=https://discord.com/api/webhooks/example/example123456789
 ```
-
-Tables that need to be created and the appropriate PostgreSQL queries are available in the path /sql/createTables.sql
-Example data/information is available in the path /sql/insertQueries.sql
 
 Service chosen by the team for hosting our database in this project:
 
